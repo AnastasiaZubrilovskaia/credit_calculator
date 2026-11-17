@@ -3,18 +3,18 @@ from decimal import Decimal
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, EmailStr, field_validator, model_validator
 
+NAME_PATTERN = r"^[A-Za-zА-Яа-яЁё-]{2,30}$"
 
 class ApiModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, json_encoders={Decimal: str})
 
-#запрос на получение кредитных предложений
-class LoanStatementRequestDto(ApiModel):
-    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
-    term: int = Field(ge=1, le=360)
-    first_name: str = Field(alias="firstName", min_length=1, max_length=50)
-    last_name: str = Field(alias="lastName", min_length=1, max_length=50)
-    middle_name: str | None = Field(default=None, alias="middleName", max_length=50)
-    email: EmailStr
+
+class DataMixin(ApiModel):
+    amount: Decimal = Field(ge=10000, max_digits=12, decimal_places=2)
+    term: int = Field(ge=6, le=360)
+    first_name: str = Field(alias="firstName", pattern=NAME_PATTERN)
+    last_name: str = Field(alias="lastName", pattern=NAME_PATTERN)
+    middle_name: str | None = Field(default=None, alias="middleName", pattern=NAME_PATTERN)
     birthdate: date
     passport_series: str = Field(alias="passportSeries", pattern=r"^\d{4}$")
     passport_number: str = Field(alias="passportNumber", pattern=r"^\d{6}$")
@@ -25,6 +25,11 @@ class LoanStatementRequestDto(ApiModel):
         if value >= date.today():
             raise ValueError("Birthdate must be in the past")
         return value
+
+
+#запрос на получение кредитных предложений
+class LoanStatementRequestDto(DataMixin):
+    email: EmailStr
 
 
 #одно кредитное предложение
@@ -39,24 +44,9 @@ class LoanOfferDto(ApiModel):
     is_salary_client: bool = Field(alias="isSalaryClient")
 
 #данные для скоринга (оценки кредитоспособности)
-class ScoringDataDto(ApiModel):
-    amount: Decimal = Field(gt=0, max_digits=12, decimal_places=2)
-    term: int = Field(ge=1, le=360)
-    first_name: str = Field(alias="firstName", min_length=1, max_length=50)
-    last_name: str = Field(alias="lastName", min_length=1, max_length=50)
-    middle_name: str | None = Field(default=None, alias="middleName", max_length=50)
-    birthdate: date
-    passport_series: str = Field(alias="passwordSeries", pattern=r"^\d{4}$")
-    passport_number: str = Field(alias="passwordNumber", pattern=r"^\d{6}$")
-    is_insurance_enabled: bool = Field(alias="isInsuranceEnable")
+class ScoringDataDto(DataMixin):
+    is_insurance_enabled: bool = Field(alias="isInsuranceEnabled")
     is_salary_client: bool = Field(alias="isSalaryClient")
-
-    @field_validator("birthdate")
-    @classmethod
-    def birthdate_not_future(cls, value: date) -> date:
-        if value >= date.today():
-            raise ValueError("Birthdate must be in the past")
-        return value
 
 
 #данные одного элемента графика платежей
