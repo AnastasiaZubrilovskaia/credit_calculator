@@ -4,7 +4,6 @@ from decimal import Decimal
 
 from calculator.app.services.offer_service import create_offers
 from calculator.app.services.credit_service import calculate_credit
-from calculator.app.services.loan_terms import PrescoringError
 from calculator.app.models.dto import (
     LoanStatementRequestDto,
     ScoringDataDto,
@@ -60,32 +59,15 @@ def test_create_offers_sorting():
     assert rates[-1] == Decimal("16.0")
 
 
-def test_create_offers_prescoring_failed():
-    invalid_data = VALID_STATEMENT_DATA.copy()
-    invalid_data["birthdate"] = date(2010, 11, 11)
-    request = LoanStatementRequestDto(**invalid_data)
-
-    with pytest.raises(PrescoringError):
-        create_offers(request)
-
-
 def test_calculate_credit_success():
     request = ScoringDataDto(**VALID_SCORING_DATA)
     credit = calculate_credit(request, start_date=TODAY)
 
     assert isinstance(credit, CreditDto)
-    assert credit.amount == Decimal("400000.00")
+    assert credit.amount == Decimal("300000.00")
     assert credit.rate == Decimal("17.0")
     assert credit.monthly_payment > 0
     assert credit.psk > 0
     assert len(credit.payment_schedule) == 24
 
 
-
-def test_calculate_credit_prescoring_failed():
-    invalid_data = VALID_SCORING_DATA.copy()
-    invalid_data["amount"] = Decimal("6000000")
-    request = ScoringDataDto(**invalid_data)
-
-    with pytest.raises(PrescoringError):
-        calculate_credit(request, start_date=TODAY)

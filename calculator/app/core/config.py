@@ -9,10 +9,6 @@ class Settings(BaseSettings):
     insurance_rate_discount: Decimal = Decimal("3.0")
     salary_rate_discount: Decimal = Decimal("1.0")
 
-    min_age: int = 18
-    max_age: int = 65
-    max_amount: Decimal = Decimal("5000000")
-
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="CALCULATOR_", extra="ignore")

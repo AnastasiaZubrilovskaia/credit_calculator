@@ -49,12 +49,12 @@ def test_get_offers_validation_error():
     assert response.status_code == 422
 
 
-def test_get_offers_prescoring_error():
+def test_get_offers_age_validation_error():
     bad_json = VALID_OFFERS_JSON.copy()
     bad_json["birthdate"] = "2015-01-01"
 
     response = client.post("/calculator/offers", json=bad_json)
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 
@@ -77,8 +77,8 @@ def test_calculate_credit_validation_error():
     assert response.status_code == 422
 
 
-def test_calculate_credit_prescoring_error():
+def test_calculate_credit_amount_validation_error():
     bad_json = VALID_CALC_JSON.copy()
     bad_json["amount"] = "6000000.00"
     response = client.post("/calculator/calc", json=bad_json)
-    assert response.status_code == 400
+    assert response.status_code == 422

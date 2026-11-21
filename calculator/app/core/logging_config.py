@@ -11,12 +11,3 @@ def configure_logging(level: str = "INFO") -> None:
         handlers=[logging.StreamHandler(sys.stdout)],
         force=True,
     )
-
-
-def mask(value: str | None, visible: int = 2) -> str | None:
-    if value is None:
-        return None
-    if len(value) <= visible:
-        return "*" * len(value)
-    return "*" * (len(value) - visible) + value[-visible:]
-

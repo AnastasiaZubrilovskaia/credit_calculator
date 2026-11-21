@@ -9,7 +9,7 @@
 ```
 2. Установить зависимости:
 ```bash
-pip install fastapi uvicorn pydantic pydantic-settings email-validator pytest pytest-cov httpx
+pip install -r requirements.txt
 ```
 
 3. Запустить сервер:
@@ -29,7 +29,7 @@ Swagger UI: http://127.0.0.1:8000/docs
 pytest
 ```
 
-Процент покрытия: 94.93%
+Процент покрытия: 95.39%
 
 ## Реализованные эндпоинты
 POST /calculator/offers — расчёт условий кредита. 
